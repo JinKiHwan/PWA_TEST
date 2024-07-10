@@ -34,11 +34,34 @@
         </div>
 
         <script>
-            if ('serviceorker' in navigator) {
+            // 1. 서비스 워커 등록
+            if ('serviceWorker' in navigator) {
                 console.log('1. 서비스 워커 등록 시도');
+                navigator.serviceWorker.register('./service_worker.js').then(function (reg) {
+                    console.log('1. 서비스 워커 등록완료 ::', reg);
+                    reg.addEventListener('updatefound', function () {
+                        console.log('updatefound!!!', reg.installing);
 
-                navigator.serviceWorker.register('./service_worker.js').then(function () {
-                    console.log('워커등록완료');
+                        // An updated service worker has appeared in reg.installing!
+                        // 업데이트된 서비스 워커가 나타나면
+                        newWorker = reg.installing;
+
+                        newWorker.addEventListener('statechange', function () {
+                            console.log('statechange:', newWorker.state, navigator.serviceWorker);
+                            // Has service worker state changed?
+                            switch (newWorker.state) {
+                                case 'installed':
+                                    console.log('newWorker.state is installed', navigator.serviceWorker.controller);
+                                    // There is a new service worker available, show the notification
+                                    // 새로운 서비스 워커가 있으면 노티를 보여줘라
+                                    if (navigator.serviceWorker.controller) {
+                                        console.log('navigator.serviceWorker.controller');
+                                        showUpdateBar();
+                                    }
+                                    break;
+                            }
+                        });
+                    });
                 });
             }
         </script>
