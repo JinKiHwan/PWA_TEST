@@ -23,6 +23,13 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                flex-direction: column;
+            }
+            button {
+                width: 150px;
+                height: 50px;
+                background: #fff;
+                border-radius: 5px;
             }
         </style>
     </head>
@@ -31,6 +38,8 @@
         <div class="container">
             <h1>HELLOW PWA</h1>
             <img src="./images/icon-main.png" alt="" />
+
+            <button id="installBtn">PWA 설치</button>
         </div>
 
         <script>
@@ -64,6 +73,38 @@
                     });
                 });
             }
+
+            let deferredPrompt;
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // 브라우저 기본 설치 프롬프트를 방지
+                e.preventDefault();
+                // 이벤트를 저장
+                deferredPrompt = e;
+                // 설치 버튼을 표시 (이미 표시되어 있으므로 이 줄은 생략 가능)
+                // document.getElementById('installBtn').style.display = 'block';
+            });
+
+            document.getElementById('installBtn').addEventListener('click', async () => {
+                if (deferredPrompt !== null) {
+                    // 프롬프트 표시
+                    deferredPrompt.prompt();
+                    // 사용자의 응답을 기다림
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('사용자가 설치를 수락했습니다');
+                    } else {
+                        console.log('사용자가 설치를 거부했습니다');
+                    }
+                    // 프롬프트를 한 번만 표시할 수 있으므로 이벤트를 null로 설정
+                    deferredPrompt = null;
+                }
+            });
+
+            // PWA가 이미 설치되어 있는 경우 버튼을 숨김
+            window.addEventListener('appinstalled', (evt) => {
+                document.getElementById('installBtn').style.display = 'none';
+            });
         </script>
     </body>
 </html>
