@@ -60,6 +60,16 @@
             });
 
             document.getElementById('installBtn').addEventListener('click', async () => {
+                // Edge에서 PWA 설치 여부 확인
+                if ('getInstalledRelatedApps' in navigator) {
+                    const relatedApps = await navigator.getInstalledRelatedApps();
+                    if (relatedApps.length > 0) {
+                        // PWA가 이미 설치되어 있으면 알림 창 표시
+                        alert('이미 PWA가 설치되어 있습니다.');
+                        return;
+                    }
+                }
+
                 if (deferredPrompt) {
                     // 프롬프트 표시
                     deferredPrompt.prompt();
