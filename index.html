@@ -40,6 +40,13 @@
             <img src="./images/icon-main.png" alt="" />
 
             <button id="installBtn">PWA 설치</button>
+
+            <button id="bookmarkBtn">즐겨찾기 추가</button>
+
+            <div id="bookmarkPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black; color: black">
+                <p id="bookmarkMessage"></p>
+                <button onclick="closeBookmarkPopup()">닫기</button>
+            </div>
         </div>
 
         <script>
@@ -105,6 +112,45 @@
             window.addEventListener('appinstalled', (evt) => {
                 document.getElementById('installBtn').style.display = 'none';
             });
+
+            // 기존 코드 아래에 추가
+
+            // 북마크 버튼 이벤트 리스너
+            document.getElementById('bookmarkBtn').addEventListener('click', addBookmark);
+
+            function addBookmark() {
+                if (window.sidebar && window.sidebar.addPanel) {
+                    // Firefox <23
+                    window.sidebar.addPanel(document.title, window.location.href, '');
+                } else if (window.external && 'AddFavorite' in window.external) {
+                    // IE
+                    window.external.AddFavorite(window.location.href, document.title);
+                } else {
+                    // Chrome, Safari, Firefox 23+
+                    showBookmarkPopup();
+                }
+            }
+
+            function showBookmarkPopup() {
+                const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+                const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+                let message = '';
+
+                if (isChrome) {
+                    message = 'Ctrl+D (Windows) 또는 Cmd+D (Mac)를 눌러 이 페이지를 북마크에 추가하세요.';
+                } else if (isSafari) {
+                    message = 'Cmd+D를 눌러 이 페이지를 북마크에 추가하세요.';
+                } else {
+                    message = '브라우저의 북마크 추가 기능을 사용하여 이 페이지를 북마크에 추가하세요.';
+                }
+
+                document.getElementById('bookmarkMessage').textContent = message;
+                document.getElementById('bookmarkPopup').style.display = 'block';
+            }
+
+            function closeBookmarkPopup() {
+                document.getElementById('bookmarkPopup').style.display = 'none';
+            }
         </script>
     </body>
 </html>
