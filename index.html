@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<!-- 언어를 한글로 설정 -->
 <html lang="ko">
     <head>
         <meta charset="UTF-8" />
-        <!-- PWA 매너페스트 파일 연결, 상태바 테마색상을 흰색으로 변경 -->
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ffffff" />
-        <!-- 모바일 기기 뷰포트, 브라우저 주소 표시줄의 파비콘 설정  -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="images/icons/favicon.ico" />
         <link rel="icon" type="image/png" sizes="16x16" href="images/icons/favicon-16x16.png" />
@@ -33,51 +30,23 @@
             }
         </style>
     </head>
-
     <body>
         <div class="container">
-            <h1>HELLOW PWA</h1>
+            <h1>HELLO PWA</h1>
             <img src="./images/icon-main.png" alt="" />
-
             <button id="installBtn">PWA 설치</button>
-
             <button id="bookmarkBtn">즐겨찾기 추가</button>
-
             <div id="bookmarkPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid black; color: black">
                 <p id="bookmarkMessage"></p>
                 <button onclick="closeBookmarkPopup()">닫기</button>
             </div>
         </div>
-
         <script>
             // 1. 서비스 워커 등록
             if ('serviceWorker' in navigator) {
                 console.log('1. 서비스 워커 등록 시도');
                 navigator.serviceWorker.register('./service_worker.js').then(function (reg) {
                     console.log('1. 서비스 워커 등록완료 ::', reg);
-                    reg.addEventListener('updatefound', function () {
-                        console.log('updatefound!!!', reg.installing);
-
-                        // An updated service worker has appeared in reg.installing!
-                        // 업데이트된 서비스 워커가 나타나면
-                        newWorker = reg.installing;
-
-                        newWorker.addEventListener('statechange', function () {
-                            console.log('statechange:', newWorker.state, navigator.serviceWorker);
-                            // Has service worker state changed?
-                            switch (newWorker.state) {
-                                case 'installed':
-                                    console.log('newWorker.state is installed', navigator.serviceWorker.controller);
-                                    // There is a new service worker available, show the notification
-                                    // 새로운 서비스 워커가 있으면 노티를 보여줘라
-                                    if (navigator.serviceWorker.controller) {
-                                        console.log('navigator.serviceWorker.controller');
-                                        showUpdateBar();
-                                    }
-                                    break;
-                            }
-                        });
-                    });
                 });
             }
 
@@ -88,12 +57,10 @@
                 e.preventDefault();
                 // 이벤트를 저장
                 deferredPrompt = e;
-                // 설치 버튼을 표시 (이미 표시되어 있으므로 이 줄은 생략 가능)
-                // document.getElementById('installBtn').style.display = 'block';
             });
 
             document.getElementById('installBtn').addEventListener('click', async () => {
-                if (deferredPrompt !== null) {
+                if (deferredPrompt) {
                     // 프롬프트 표시
                     deferredPrompt.prompt();
                     // 사용자의 응답을 기다림
@@ -105,15 +72,18 @@
                     }
                     // 프롬프트를 한 번만 표시할 수 있으므로 이벤트를 null로 설정
                     deferredPrompt = null;
+                } else {
+                    // 이미 설치된 경우 알림 창 표시
+                    alert('이미 PWA가 설치되어 있습니다.');
                 }
             });
 
             // PWA가 이미 설치되어 있는 경우 버튼을 숨김
             window.addEventListener('appinstalled', (evt) => {
+                console.log('PWA가 설치되었습니다.');
                 document.getElementById('installBtn').style.display = 'none';
+                alert('PWA가 설치되었습니다.');
             });
-
-            // 기존 코드 아래에 추가
 
             // 북마크 버튼 이벤트 리스너
             document.getElementById('bookmarkBtn').addEventListener('click', addBookmark);
