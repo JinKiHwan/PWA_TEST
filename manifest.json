@@ -2,7 +2,7 @@
     "name": "PWA 테스트 앱",
     "short_name": "PWA",
     "description": "PWA 테스트입니다",
-    "scope": "/index.html",
+    "scope": "/sub/",
     "start_url": "/index.html",
     "display": "fullscreen",
     "orientation": "portrait",
